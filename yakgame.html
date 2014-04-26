@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Yak game</title>
+    <script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
+    <script src="yakgame.js"></script>
+  </head>
+  <body onLoad="init();">
+    <div style="float:left;">
+        <canvas id="testCanvas" width="640" height="960">Yak game canvas</canvas>
+    </div>
+    <div style="float:left;">
+        <div><button type="button" onClick="setup();">Reset</button></div>
+        <div><button type="button" onClick="createjs.Ticker.reset();">Stop</button></div>
+    </div>
+    <div style="clear:both;">
+        <textarea id="log" rows="6" cols="90"></textarea>
+    </div>
+  </body>
+</html>
