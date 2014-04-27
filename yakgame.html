@@ -2,21 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Yak game</title>
     <script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
     <script src="yakgame.js"></script>
+    <script src="tasks.js"></script>
+    <script src="floors.js"></script>
+    <script src="dwarves.js"></script>
   </head>
-  <body onLoad="init();">
+  <body onLoad="init();" style="margin:0px">
     <div style="float:left;">
         <canvas id="testCanvas" width="640" height="960">Yak game canvas</canvas>
     </div>
-    <div style="float:left;">
+    <div style="clear:both;">
         <div><button type="button" onClick="setup();">Reset</button></div>
         <div><button type="button" onClick="createjs.Ticker.reset();">Stop</button></div>
     </div>
     <div style="clear:both;">
-        <textarea id="log" rows="6" cols="90"></textarea>
+        <textarea id="log" rows="6" cols="40"></textarea>
     </div>
   </body>
 </html>
