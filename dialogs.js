@@ -12,7 +12,8 @@ function load_dialogs() {
   jobdialog = new createjs.Container();
   var jobbackground = new createjs.Bitmap('jobpane.png');
   jobdialog.addChild(jobbackground);
-  var dialogsize = jobbackground.getBounds();
+  //var dialogsize = jobbackground.getBounds();
+  var dialogsize = new createjs.Rectangle(0,0,640,640);
   jobdialog.x = canvas.width/2 - dialogsize.width/2;
   jobdialog.y = canvas.height/2 - dialogsize.height/2;
 

@@ -136,6 +136,7 @@ Task_UpgradeFloor.prototype.doit = function(dwarf) {
 function Job_UpgradeFloor(floor,type) {
   this.name = 'Upgrade floor '+floor;
   this.tasks = [];
+  this.weight = function(dwarf) {return 100;};
   this.tasks.push(new Task_WalkTo(floor, floorwidth / 2));
   this.tasks.push(new Task_UpgradeFloor(floor,type));
   this.dwarf = null;
@@ -144,6 +145,7 @@ function Job_UpgradeFloor(floor,type) {
 function Job_DigFloor(floor) {
   this.name = 'Dig floor '+floor;
   this.tasks = [];
+  this.weight = function(dwarf) {return 100;};
   this.tasks.push(new Task_WalkTo(floor-1, floorwidth / 2));
   this.tasks.push(new Task_DigFloor(floor));
   this.dwarf = null;
@@ -152,6 +154,7 @@ function Job_DigFloor(floor) {
 function Job_WasteTime() {
   this.name = 'Waste time';
   this.tasks = [];
+  this.weight = function(dwarf) {return 100;};
   this.tasks.push(Task_RandomWalk);
   this.dwarf = null;
 }

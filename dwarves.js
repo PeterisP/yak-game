@@ -68,25 +68,32 @@ Dwarf.prototype.update = function() {
     this.sprite.gotoAndPlay(this.pic+'_'+task.animation);
     this.prevtask = task;
   }
-  task.doit(this);
+  if (task == null) {
+    console.log('No tasks found for dwarf ' + this.name);
+    task = Task_RandomWalk;
+  } else {
+    task.doit(this);
+  }
   this.sprite.x = this.x;
   this.sprite.y = floorstart + (this.floor-1)*floorheight + floormargin;
 }
 Dwarf.prototype.fetch_job = function() {
-  possible_jobs = [{job:Job_WasteTime, weight:100}];
+  possible_jobs = [{job:new Job_WasteTime(), weight:100}];
   for (job_id in job_queue) {
     if (job_queue[job_id].dwarf == null) {
       var job = job_queue[job_id];
-      possible_jobs.push({job:job, weight:job.weight(dwarf)});
-      job = job_queue[job_id];
+      possible_jobs.push({job:job, weight:job.weight(this)});
     }
   }
-  //var job = weighted_random(possible_jobs);
-  job = Task_RandomWalk;
+  var job = weighted_random(possible_jobs).job;
   this.tasks = this.tasks.concat(job.tasks);
       // NB! te ir tas pats task eksemplaars, tas nodroshina puspabeigtu job turpinaashanu
   job.dwarf = this;
   this.currentjob = job;
+  if (this.tasks.length == 0) {
+    log('wtf');
+    console.log(possible_jobs);
+  }
 }
 Dwarf.prototype.add_task = function(task) {
   this.tasks.push(task);
@@ -151,4 +158,7 @@ function weighted_random(items) {
             return(items[i]);
         }
     }
+    console.log('WTF weighted random salūza');
+    concat.log(items);
+    return items[0]; // FIXME - te nev nekad jānonāk
 }
