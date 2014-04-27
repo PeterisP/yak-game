@@ -18,11 +18,15 @@ var Task_RandomWalk = {
       }
       if (dwarf.x < floormargin) {dwarf.x = floormargin;}
       if (dwarf.x > floorwidth-dwarfwidth-floormargin) {dwarf.x = floorwidth-dwarfwidth-floormargin;}
+      if (Math.random() < 0.2) {
+        dwarf.task_done(this);
+      }
     }
   }
 }
 
 function Task_WalkTo(floor, x) {
+  //console.log("Start walking: " + floor);
   this.targetfloor = floor;
   this.targetx = x;
   this.name = 'Go to floor '+floor;
@@ -56,6 +60,7 @@ Task_WalkTo.prototype.doit = function(dwarf) {
         if (floors[newfloor].contents == floortypes.filled) {
           dwarf.task_fail(this, "Can't go to a floor that's not dug out yet!");
         } else {
+          dwarf.floor = newfloor;
         }
       } else if (Math.abs(distance) <= dwarfstep) {
         // Move to the stairs
@@ -69,33 +74,84 @@ Task_WalkTo.prototype.doit = function(dwarf) {
   }
 }
 
-function Task_DigDeeper() {
+function Task_DigFloor(floor) {
   this.progress = 0;
+  this.floor = floor;
 }
-Task_DigDeeper.prototype.name = 'Dig deeper';
-Task_DigDeeper.prototype.description = 'Dig a new floor below the last available one';
-Task_DigDeeper.prototype.work_ticks = 300;
-Task_DigDeeper.prototype.animation = 'pick';
-Task_DigDeeper.prototype.doit = function(dwarf) {
-  var diggable_floor = null;
-  for (var i in floors) {
-    if (floors[i].contents == floortypes.filled) {
-      diggable_floor = floors[i];
-      break;
-    }
-  }
-  if (diggable_floor == null) {
-    dwarf.task_fail(this, 'no diggable floors found');
-    return;
-  }
-  if (dwarf.floor+1 != diggable_floor.level) {
+Task_DigFloor.prototype.name = 'Dig deeper';
+Task_DigFloor.prototype.description = 'Dig a new floor below the last available one';
+Task_DigFloor.prototype.work_ticks = 200;
+Task_DigFloor.prototype.animation = 'pick';
+Task_DigFloor.prototype.doit = function(dwarf) {
+  if (dwarf.floor+1 != this.floor) {
     dwarf.task_fail(this, 'not above diggable floor');
     return;
   }
 
   this.progress++;
   if (this.progress > this.work_ticks) {
-    diggable_floor.set_contents(floortypes.empty);
+    floors[this.floor].set_contents(floortypes.empty);
     dwarf.task_done(this);
   }
+}
+
+function Task_UpgradeFloor(targetFloor, type) {
+  this.progress = 0;
+  this.targetFloor = targetFloor;
+  this.type = type;
+}
+Task_UpgradeFloor.prototype.name = 'Upgrade room';
+Task_UpgradeFloor.prototype.description = 'Upgrade room to something more useful';
+Task_UpgradeFloor.prototype.work_ticks = 200;
+Task_UpgradeFloor.prototype.animation = 'pick';
+Task_UpgradeFloor.prototype.doit = function(dwarf) {
+
+  //console.log(event);
+  if (dwarf.floor != this.targetFloor) {
+    dwarf.task_fail(this, 'wrong room');
+    return;
+  }
+
+  if (this.type < 0.2) {
+    ftype = 2;
+  } else if (this.type < 0.4) {
+    ftype = 4;
+  } else if (this.type < 0.6) {
+    ftype = 6;
+  } else if (this.type < 0.8) {
+    ftype = 8;
+  } else {
+    ftype = 10;
+  }
+
+  this.progress++;
+  if (this.progress > this.work_ticks) {
+    floors[dwarf.floor].set_contents(ftype);
+    dwarf.task_done(this);
+  }
+}
+
+// ------------- jobs --------
+
+function Job_UpgradeFloor(floor,type) {
+  this.name = 'Upgrade floor '+floor;
+  this.tasks = [];
+  this.tasks.push(new Task_WalkTo(floor, floorwidth / 2));
+  this.tasks.push(new Task_UpgradeFloor(floor,type));
+  this.dwarf = null;
+}
+
+function Job_DigFloor(floor) {
+  this.name = 'Dig floor '+floor;
+  this.tasks = [];
+  this.tasks.push(new Task_WalkTo(floor-1, floorwidth / 2));
+  this.tasks.push(new Task_DigFloor(floor));
+  this.dwarf = null;
+}
+
+function Job_WasteTime() {
+  this.name = 'Waste time';
+  this.tasks = [];
+  this.tasks.push(Task_RandomWalk);
+  this.dwarf = null;
 }

@@ -5,19 +5,9 @@ var fons;
 var lblFPS;
 var log_area;
 
-var dwarves = [];
-var dwarfpics;
-
-var move_speed = 0.05; // Chance to move at each 60fps tick.
-var dwarfstep = 16; // step size in px
-var dwarfwidth = 64 // dwarf sprite width
-
-var jobdialog;
-var activedialog = null;
-var curtain;
+var stuff_images;
 
 function init() {
-  var canvas = document.getElementById('testCanvas');
   log_area = document.getElementById('log');
 
   stage = new createjs.Stage('testCanvas');
@@ -33,30 +23,19 @@ function init() {
   lblFPS = new createjs.Text('', '20px Arial', '#FF7700');
 
   load_floors();
+  load_dwarves();
 
-  dwarfpics = new createjs.SpriteSheet({
-    images: ['ruukji.png'],
-    frames: {width:dwarfwidth, height:64},
+  stuff_images = new createjs.SpriteSheet({
+    images: ['80x80_stuff.png'],
+    frames: {width:80, height:80},
     animations: {
-      hauler_default: [0,1],
-      hauler_pick: [2,4],
-      warrior_default: 8,
-      warrior_pick: [10,12],
-      craftsman_default: 16,
-      craftsman_pick: [18,20]
+      stairs: 0,
+      pauseplay: [4,5],
+      close:6
     }
   });
 
-  curtain = new createjs.Shape();
-  curtain.graphics.beginFill("#000000").drawRect(0,0,canvas.width, canvas.height);
-  curtain.alpha = 0.5;
-
-  jobdialog = new createjs.Container();
-  var jobbackground = new createjs.Bitmap('jobpane.png');
-  jobdialog.addChild(jobbackground);
-  var dialogsize = jobbackground.getBounds();
-  jobdialog.x = canvas.width/2 - dialogsize.width/2;
-  jobdialog.y = canvas.height/2 - dialogsize.height/2;
+  load_dialogs();
 
   setup();
 }
@@ -75,12 +54,7 @@ function setup() {
     floors[i] = new Floor(floortypes['filled'], i);
   }
 
-  dwarves = [];
-  dwarves.push(new Dwarf('hauler', 0,100,'Urists 1'));
-  dwarves.push(new Dwarf('warrior', 0,200,'Urists 2'));
-  dwarves.push(new Dwarf('craftsman', 0,300,'Urists 3'));
-  dwarves[0].add_task(new Task_WalkTo(3,30));
-  dwarves[2].add_task(new Task_DigDeeper());
+  setup_dwarves();
 
   curtain.visible = false;
   stage.addChild(curtain);
@@ -101,6 +75,14 @@ function handleTick(event) {
     var dwarf = dwarves[dwarf_nr];
     dwarf.update();
   }
+
+  var job_description = "";
+  for (var job_nr in job_queue) {
+    var dwarfname = '';
+    if (job_queue[job_nr].dwarf != null) {dwarfname = job_queue[job_nr].dwarf.name;}
+    job_description += job_queue[job_nr].name + ': ' + dwarfname + '\n';
+  }
+  job_panel.text = job_description;
 
   stage.update(event);
 }
